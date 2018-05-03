@@ -142,13 +142,14 @@
                 if (win($(this))) {
                     $('.turn-tab.'+side).addClass('animated pulse infinite');
                     $('.stats div:first-child i').html(piece).addClass(''+color+'');
+                    $('.stats div:nth-child(2)').html('Wins');
                     $('#tictactoe').attr('style','pointer-events:none;');
                     $('.quit').addClass('disabled');
                     setTimeout(function(){
                         pager('result','game');
                     }, 3000);
                 } else if (moves === SIZE * SIZE) {
-                    $('.stats div:nth-child(2)').html('It\'s a draw').addClass(''+color+'');
+                    $('.stats div:nth-child(2)').html('It\'s a draw');
                     $('#tictactoe').attr('style','pointer-events:none;filter:grayscale();');
                     $('.quit').addClass('disabled');
                     setTimeout(function(){
@@ -156,7 +157,7 @@
                     }, 3000);
                 } else {
                     $('.turn-tab').addClass('go');
-                    $('.turn-tab.'+side).removeClass('go').find('span').html(score[turn]).addClass('animated bounceIn').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+                    $('.turn-tab.'+side).removeClass('go').find('span').html(formatScore(score[turn])).addClass('animated bounceIn').one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
                         $(this).removeClass('animated bounceIn');
                     });
                     turn = turn === "X" ? "O" : "X";
@@ -187,6 +188,23 @@
                 
                 $(document.getElementById("tictactoe") || document.body).html(board).removeAttr('style');
                 startNewGame();
+            }
+
+            function formatScore(value) {
+                var newValue = value;
+                if (value >= 1000) {
+                    var suffixes = ["", "k", "m", "b","t"];
+                    var suffixNum = Math.floor( (""+value).length/3 );
+                    var shortValue = '';
+                    for (var precision = 2; precision >= 1; precision--) {
+                        shortValue = parseFloat( (suffixNum != 0 ? (value / Math.pow(1000,suffixNum) ) : value).toPrecision(precision));
+                        var dotLessShortValue = (shortValue + '').replace(/[^a-zA-Z 0-9]+/g,'');
+                        if (dotLessShortValue.length <= 2) { break; }
+                    }
+                    if (shortValue % 1 != 0)  shortNum = shortValue.toFixed(1);
+                    newValue = shortValue+suffixes[suffixNum];
+                }
+                return newValue;
             }
 
             function saveSize(){
